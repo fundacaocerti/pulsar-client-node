@@ -17,7 +17,7 @@
  * under the License.
  */
 
-const Pulsar = require('pulsar-client');
+const Pulsar = require('../index.js');
 
 (async () => {
   const auth = new Pulsar.AuthenticationTls({

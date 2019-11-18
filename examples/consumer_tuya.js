@@ -17,20 +17,35 @@
  * under the License.
  */
 
-const PulsarBinding = require('bindings')('Pulsar');
-const AuthenticationTls = require('./src/AuthenticationTls.js');
-const AuthenticationAthenz = require('./src/AuthenticationAthenz.js');
-const AuthenticationToken = require('./src/AuthenticationToken.js');
-const AuthenticationTuya = require('./src/AuthenticationTuya.js');
+//const Pulsar = require('pulsar-client');
+const Pulsar = require('../index.js');
 
-const Pulsar = {
-  Client: PulsarBinding.Client,
-  Message: PulsarBinding.Message,
-  MessageId: PulsarBinding.MessageId,
-  AuthenticationTls,
-  AuthenticationAthenz,
-  AuthenticationToken,
-  AuthenticationTuya,
-};
-
-module.exports = Pulsar;
+(async () => {
+  // Create a client
+      
+  const auth = new Pulsar.AuthenticationTuya({
+    accessId: '',
+    accessKey: '',
+  });
+  const client = new Pulsar.Client({
+    serviceUrl: "pulsar+ssl://mqe.tuyaus.com:7285/",
+    authentication: auth,
+    tlsAllowInsecureConnection: true,
+  });
+  // Create a consumer
+   const consumer = await client.subscribe({
+    topic: '',
+    subscription: '',
+    ackTimeoutMs: 10000,
+   });
+  // Receive messages
+     
+  for (let i = 0; i < 10000; i += 1) {
+    const msg = await consumer.receive();
+    console.log(msg.getData().toString());
+    consumer.acknowledge(msg);
+  }
+  await consumer.close();
+  await client.close();
+ 
+})();
